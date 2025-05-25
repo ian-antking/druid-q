@@ -17,5 +17,11 @@ MESSAGES = {
     "no_reader_error": "❌ No smart card readers found.",
     "user_interrupt": "🛑 Interrupted by user.",
 
-    "latest_events": "📡 Latest Info Event"
+    "waiting_for_events": "🔄 Waiting for events...",
+    "latest_events": "📡 Latest Info Event",
+
+    "header_title": "⟊ Mana Relay Online ⟊",
+    "body_title": "✧ Arcane Signal ✧",
+    "footer_title": "⚙ Glyph Engine Stable • Listening...",
+
 }
