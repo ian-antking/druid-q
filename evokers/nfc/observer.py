@@ -4,22 +4,28 @@ import queue
 from smartcard.Exceptions import CardConnectionException
 from smartcard.CardMonitoring import CardObserver
 import ndef
+from event import Event
+from strings import MESSAGES
 
 class NFCCardObserver(CardObserver):
-    def __init__(self, data_queue=None):
+
+    def __init__(self, event_queue=None):
         self.card_processed = threading.Event()
-        self.data_queue = data_queue or queue.Queue()
+        self.event_queue = event_queue or queue.Queue()
+
+    def emit(self, type_, payload):
+        self.event_queue.put(Event(type_, payload))
 
     def update(self, _, cards):
         added_cards, removed_cards = cards
 
         for card in added_cards:
-            print("📡 Card inserted")
+            self.emit("info", MESSAGES["card_inserted"])
             connection = card.createConnection()
             try:
                 connection.connect()
             except CardConnectionException:
-                print("❌ Failed to connect to card")
+                self.emit("info", MESSAGES["failed_connect"])
                 return
 
             raw_data = []
@@ -32,7 +38,7 @@ class NFCCardObserver(CardObserver):
                 if sw1 == 0x90 and sw2 == 0x00:
                     raw_data.extend(response)
                 else:
-                    print(f"❌ Failed to read page {page}: SW1={hex(sw1)} SW2={hex(sw2)}")
+                    self.emit("info", MESSAGES["failed_read_page"].format(page=page, sw1=hex(sw1), sw2=hex(sw2)))
                     return
 
             try:
@@ -40,35 +46,32 @@ class NFCCardObserver(CardObserver):
                 length = raw_data[ndef_start + 1]
                 ndef_bytes = bytes(raw_data[ndef_start + 2 : ndef_start + 2 + length])
             except ValueError:
-                print("❌ No NDEF TLV (0x03) found.")
+                self.emit("info", MESSAGES["no_ndef"])
                 return
             except IndexError:
-                print("❌ NDEF length exceeds available data.")
+                self.emit("info", MESSAGES["ndef_too_long"])
                 return
 
             try:
                 ndef_records = list(ndef.message_decoder(ndef_bytes))
                 for record in ndef_records:
-                    print(f"📦 Record Type: {record.type} (type: {type(record.type)})")
                     rtype = record.type
                     if isinstance(rtype, bytes):
                         rtype = rtype.decode('utf-8')
                     
-                if rtype == 'application/json':
-                    json_payload = record.data.decode('utf-8')
-                    try:
-                        parsed = json.loads(json_payload)
-                        print("✅ Decoded JSON:")
-                        self.data_queue.put(parsed)
-                    except json.JSONDecodeError:
-                        print("⚠️ Invalid JSON, raw payload:")
-                        print(json_payload)
-                    self.card_processed.set()
-                    return
-                print("ℹ️ No application/json record found.")
+                    if rtype == 'application/json':
+                        json_payload = record.data.decode('utf-8')
+                        try:
+                            parsed = json.loads(json_payload)
+                            self.emit("info", MESSAGES["decoded_json"])
+                            self.emit("game", parsed)
+                        except json.JSONDecodeError:
+                            self.emit("info", MESSAGES["invalid_json"].format(payload=json_payload))
+                        self.card_processed.set()
+                        return
+                self.emit("info", MESSAGES["no_json_record"])
             except Exception as e:
-                print(f"❌ Failed to decode NDEF: {e}")
-
+                self.emit("info", MESSAGES["failed_decode"].format(error=e))
 
         for card in removed_cards:
-            print("👋 Card removed")
+            self.emit("info", MESSAGES["card_removed"])
