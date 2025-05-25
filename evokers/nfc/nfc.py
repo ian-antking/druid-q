@@ -1,7 +1,7 @@
+import queue
 from smartcard.System import readers
 from smartcard.CardMonitoring import CardMonitor
 from observer import NFCCardObserver
-import time
 
 def main():
     r = readers()
@@ -13,12 +13,18 @@ def main():
     print("📡 Waiting for cards...")
 
     card_monitor = CardMonitor()
-    observer = NFCCardObserver()
+    data_queue = queue.Queue()
+    observer = NFCCardObserver(data_queue=data_queue)
     card_monitor.addObserver(observer)
 
     try:
         while True:
-            time.sleep(1)
+            try:
+                data = data_queue.get(timeout=1)
+                print("🚀 Main received JSON object from card:")
+                print(data)
+            except queue.Empty:
+                pass
     except KeyboardInterrupt:
         print("\n🛑 Interrupted by user.")
     finally:

@@ -1,12 +1,14 @@
 import threading
 import json
+import queue
 from smartcard.Exceptions import CardConnectionException
 from smartcard.CardMonitoring import CardObserver
 import ndef
 
 class NFCCardObserver(CardObserver):
-    def __init__(self):
+    def __init__(self, data_queue=None):
         self.card_processed = threading.Event()
+        self.data_queue = data_queue or queue.Queue()
 
     def update(self, _, cards):
         added_cards, removed_cards = cards
@@ -52,17 +54,17 @@ class NFCCardObserver(CardObserver):
                     if isinstance(rtype, bytes):
                         rtype = rtype.decode('utf-8')
                     
-                    if rtype == 'application/json':
-                        json_payload = record.data.decode('utf-8')
-                        try:
-                            parsed = json.loads(json_payload)
-                            print("✅ Decoded JSON:")
-                            print(json.dumps(parsed, indent=2))
-                        except json.JSONDecodeError:
-                            print("⚠️ Invalid JSON, raw payload:")
-                            print(json_payload)
-                        self.card_processed.set()
-                        return
+                if rtype == 'application/json':
+                    json_payload = record.data.decode('utf-8')
+                    try:
+                        parsed = json.loads(json_payload)
+                        print("✅ Decoded JSON:")
+                        self.data_queue.put(parsed)
+                    except json.JSONDecodeError:
+                        print("⚠️ Invalid JSON, raw payload:")
+                        print(json_payload)
+                    self.card_processed.set()
+                    return
                 print("ℹ️ No application/json record found.")
             except Exception as e:
                 print(f"❌ Failed to decode NDEF: {e}")
