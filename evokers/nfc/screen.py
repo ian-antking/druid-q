@@ -5,6 +5,8 @@ from rich.console import Console
 from rich.panel import Panel
 from event import Event, InfoEvent
 
+from strings import MESSAGES
+
 class ScreenManager:
     def __init__(self):
         self._event_queue = Queue()
@@ -17,7 +19,6 @@ class ScreenManager:
 
     def run(self):
         self._console.clear()
-        self._console.print("🖥️ [bold green]ScreenManager started[/bold green]")
 
         while self._running:
             try:
@@ -28,7 +29,7 @@ class ScreenManager:
 
             self._console.clear()
             self._console.print(
-                Panel(self._latest_info, title="📡 Latest Info Event", expand=False)
+                Panel(self._latest_info, title=MESSAGES["latest_events"], expand=False)
             )
             time.sleep(0.5) 
 

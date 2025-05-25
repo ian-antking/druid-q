@@ -15,7 +15,7 @@ MESSAGES = {
 
     "missing_env_error": "Missing one or more Druid environment variables.",
     "no_reader_error": "❌ No smart card readers found.",
-    "user_interrupt": "🛑 Interrupted by user."
+    "user_interrupt": "🛑 Interrupted by user.",
 
-
+    "latest_events": "📡 Latest Info Event"
 }
