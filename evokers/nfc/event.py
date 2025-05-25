@@ -15,7 +15,7 @@ class InfoEvent(Event):
 
 @dataclass
 class GameEvent(Event):
-    payload: Dict[str, str]  # e.g., {"topic": "...", "message": "..."}
+    payload: Dict[str, str]
 
     def __init__(self, topic: str, message: str):
         super().__init__(type="game")

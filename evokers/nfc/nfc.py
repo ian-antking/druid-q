@@ -44,7 +44,7 @@ def main():
                     publisher.publish(event.payload)
                     screen.update(InfoEvent(MESSAGES["published_event"].format(event=event.payload)))
                 else:
-                    screen.update(event.payload)
+                    screen.update(event)
 
             except queue.Empty:
                 pass
