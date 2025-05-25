@@ -7,8 +7,6 @@ class Publisher:
     def __init__(self, host, username, password):
         ws_path = "/ws"
 
-        print(f"Connecting to host: {host} with WS path: {ws_path}")
-
         self.client = mqtt.Client(transport="websockets")
         self.client.username_pw_set(username, password)
         self.client.ws_set_options(path=ws_path)
