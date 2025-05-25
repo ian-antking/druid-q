@@ -1,7 +1,22 @@
+from dataclasses import dataclass
+from typing import Literal, Union, Dict
+
+@dataclass
 class Event:
-    def __init__(self, type_, payload):
-        self.type = type_
-        self.payload = payload
-    
-    def __repr__(self):
-        return f"Event(type={self.type!r}, payload={self.payload!r})"
+    type: Literal["info", "game"]
+
+@dataclass
+class InfoEvent(Event):
+    payload: str
+
+    def __init__(self, message: str):
+        super().__init__(type="info")
+        self.payload = message
+
+@dataclass
+class GameEvent(Event):
+    payload: Dict[str, str]  # e.g., {"topic": "...", "message": "..."}
+
+    def __init__(self, topic: str, message: str):
+        super().__init__(type="game")
+        self.payload = {"topic": topic, "message": message}

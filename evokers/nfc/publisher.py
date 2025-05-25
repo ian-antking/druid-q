@@ -16,9 +16,9 @@ class Publisher:
         self.client.connect(host, 443)
         self.client.loop_start()
 
-    def publish(self, topic: str, message: dict):
-        payload = json.dumps(message)
-        self.client.publish(topic, payload)
+    def publish(self, event):
+        payload = json.dumps(event["message"])
+        self.client.publish(event["topic"], payload)
 
     def close(self):
         self.client.loop_stop()

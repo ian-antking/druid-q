@@ -8,5 +8,14 @@ MESSAGES = {
     "no_json_record": "ℹ️ No application/json record found.",
     "failed_decode": "❌ Failed to decode NDEF: {error}",
     "card_removed": "👋 Card removed",
-    "decoded_json": "✅ Decoded JSON:"
+    "decoded_json": "✅ Decoded JSON:",
+
+    "available_readers": "✅ Available readers: {readers}\n📡 Waiting for cards...",
+    "published_event": "🚀 Published game event: {event}",
+
+    "missing_env_error": "Missing one or more Druid environment variables.",
+    "no_reader_error": "❌ No smart card readers found.",
+    "user_interrupt": "🛑 Interrupted by user."
+
+
 }

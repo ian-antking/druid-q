@@ -4,8 +4,11 @@ from smartcard.CardMonitoring import CardMonitor
 from observer import NFCCardObserver
 from publisher import Publisher
 from screen import ScreenManager
+from event import InfoEvent, GameEvent
 from dotenv import load_dotenv
 import os
+
+from strings import MESSAGES
 
 load_dotenv()
 
@@ -14,20 +17,16 @@ DRUID_USERNAME = os.getenv("DRUID_USERNAME")
 DRUID_PASSWORD = os.getenv("DRUID_PASSWORD")
 
 if not (DRUID_URL and DRUID_USERNAME and DRUID_PASSWORD):
-    raise EnvironmentError("Missing one or more Druid environment variables.")
+    raise EnvironmentError(MESSAGES["missing_env_error"])
 
 def main():
     r = readers()
-    screen = ScreenManager()  # Starts internal thread
-
+    screen = ScreenManager()
     if not r:
-        screen.update({"type": "info", "message": "❌ No smart card readers found."})
+        screen.update(InfoEvent(MESSAGES["no_reader"]))
         return
 
-    screen.update({
-        "type": "info",
-        "message": f"✅ Available readers: {r}\n📡 Waiting for cards..."
-    })
+    screen.update(InfoEvent(MESSAGES["available_readers"].format(readers=r)))
 
     card_monitor = CardMonitor()
     event_queue = queue.Queue()
@@ -41,12 +40,9 @@ def main():
             try:
                 event = event_queue.get(timeout=1)
 
-                if event.type == "game":
-                    publisher.publish(event.payload['topic'], event.payload['message'])
-                    screen.update({
-                        "type": "info",
-                        "message": f"🚀 Published game event: {event.payload}"
-                    })
+                if isinstance(event, GameEvent):
+                    publisher.publish(event.payload)
+                    screen.update(InfoEvent(MESSAGES["published_event"].format(event=event.payload)))
                 else:
                     screen.update(event.payload)
 
@@ -54,7 +50,7 @@ def main():
                 pass
 
     except KeyboardInterrupt:
-        screen.update({"type": "info", "message": "🛑 Interrupted by user."})
+        screen.update(InfoEvent(MESSAGES["user_interrupt"]))
     finally:
         card_monitor.deleteObserver(observer)
         publisher.close()
