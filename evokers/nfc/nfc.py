@@ -2,6 +2,17 @@ import queue
 from smartcard.System import readers
 from smartcard.CardMonitoring import CardMonitor
 from observer import NFCCardObserver
+from dotenv import load_dotenv
+import os
+
+load_dotenv() 
+
+DRUID_URL = os.getenv("DRUID_URL")
+DRUID_USERNAME = os.getenv("DRUID_USERNAME")
+DRUID_PASSWORD = os.getenv("DRUID_PASSWORD")
+
+if not (DRUID_URL and DRUID_USERNAME and DRUID_PASSWORD):
+    raise EnvironmentError("Missing one or more Druid environment variables.")
 
 def main():
     r = readers()

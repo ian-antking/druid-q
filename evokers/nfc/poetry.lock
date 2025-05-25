@@ -58,7 +58,22 @@ files = [
 [package.extras]
 gui = ["wxPython"]
 
+[[package]]
+name = "python-dotenv"
+version = "1.1.0"
+description = "Read key-value pairs from a .env file and set them as environment variables"
+optional = false
+python-versions = ">=3.9"
+groups = ["main"]
+files = [
+    {file = "python_dotenv-1.1.0-py3-none-any.whl", hash = "sha256:d7c01d9e2293916c18baf562d95698754b0dbbb5e74d457c45d4f6561fb9d55d"},
+    {file = "python_dotenv-1.1.0.tar.gz", hash = "sha256:41f90bc6f5f177fb41f53e87666db362025010eb28f60a01c9143bfa33a2b2d5"},
+]
+
+[package.extras]
+cli = ["click (>=5.0)"]
+
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "0ec3d12b69b0c69bb8387b3f3b9b04ff2088e081ba35767da08b2394c3dd3553"
+content-hash = "71f01074b868ecc86c54a333e5b6ce9c856a773e4b3db6606b6e48eee22f6287"
