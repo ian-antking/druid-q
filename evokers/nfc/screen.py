@@ -16,32 +16,26 @@ class ScreenManager:
         self._thread.start()
 
     def run(self):
-        """Start the screen manager display loop."""
         self._console.clear()
         self._console.print("🖥️ [bold green]ScreenManager started[/bold green]")
 
         while self._running:
             try:
-                # Poll the event queue for new info updates
                 info = self._event_queue.get(timeout=0.1)
                 self._latest_info = info
             except Empty:
                 pass
 
-            # Redraw the screen with the latest info
             self._console.clear()
             self._console.print(
                 Panel(self._latest_info, title="📡 Latest Info Event", expand=False)
             )
-            time.sleep(0.5)  # Simple render throttle
+            time.sleep(0.5) 
 
     def update(self, event: Event):
-        """Send a new info event to the display loop."""
-
         if isinstance(event, InfoEvent):
             self._event_queue.put(event.payload)
 
     def stop(self):
-        """Optional stop method if you ever want to shut down gracefully."""
         self._running = False
         self._thread.join()

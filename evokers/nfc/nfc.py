@@ -54,6 +54,7 @@ def main():
     finally:
         card_monitor.deleteObserver(observer)
         publisher.close()
+        screen.stop()
 
 if __name__ == "__main__":
     main()
