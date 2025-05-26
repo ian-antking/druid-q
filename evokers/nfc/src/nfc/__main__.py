@@ -4,7 +4,7 @@ from smartcard.CardMonitoring import CardMonitor
 from .observer import NFCCardObserver
 from .publisher import Publisher
 from .screen import ScreenManager
-from .event import InfoEvent, GameEvent
+from events import InfoEvent, GameEvent
 from dotenv import load_dotenv
 import os
 
