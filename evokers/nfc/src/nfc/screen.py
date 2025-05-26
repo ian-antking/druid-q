@@ -8,9 +8,9 @@ from rich.text import Text
 from rich.live import Live
 from rich.theme import Theme
 from rich import box
-from event import Event, InfoEvent
+from .event import Event, InfoEvent
 
-from strings import MESSAGES
+from .strings import MESSAGES
 
 custom_theme = Theme({
     "arcane": "bold magenta",

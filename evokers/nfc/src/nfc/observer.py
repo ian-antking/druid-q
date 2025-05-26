@@ -4,8 +4,8 @@ import queue
 from smartcard.Exceptions import CardConnectionException
 from smartcard.CardMonitoring import CardObserver
 import ndef
-from event import InfoEvent, GameEvent
-from strings import MESSAGES
+from .event import InfoEvent, GameEvent
+from .strings import MESSAGES
 
 class NFCCardObserver(CardObserver):
 

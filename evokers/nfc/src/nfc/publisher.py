@@ -1,7 +1,5 @@
 import json
 import paho.mqtt.client as mqtt
-from urllib.parse import urlparse
-
 
 class Publisher:
     def __init__(self, host, username, password):

@@ -1,14 +1,14 @@
 import queue
 from smartcard.System import readers
 from smartcard.CardMonitoring import CardMonitor
-from observer import NFCCardObserver
-from publisher import Publisher
-from screen import ScreenManager
-from event import InfoEvent, GameEvent
+from .observer import NFCCardObserver
+from .publisher import Publisher
+from .screen import ScreenManager
+from .event import InfoEvent, GameEvent
 from dotenv import load_dotenv
 import os
 
-from strings import MESSAGES
+from .strings import MESSAGES
 
 load_dotenv()
 
