@@ -12,11 +12,11 @@ from strings import MESSAGES
 
 load_dotenv()
 
-DRUID_URL = os.getenv("DRUID_URL")
+DRUID_HOST = os.getenv("DRUID_HOST")
 DRUID_USERNAME = os.getenv("DRUID_USERNAME")
 DRUID_PASSWORD = os.getenv("DRUID_PASSWORD")
 
-if not (DRUID_URL and DRUID_USERNAME and DRUID_PASSWORD):
+if not (DRUID_HOST and DRUID_USERNAME and DRUID_PASSWORD):
     raise EnvironmentError(MESSAGES["missing_env_error"])
 
 def main():
@@ -33,7 +33,7 @@ def main():
     observer = NFCCardObserver(event_queue=event_queue)
     card_monitor.addObserver(observer)
 
-    publisher = Publisher(DRUID_URL, DRUID_USERNAME, DRUID_PASSWORD)
+    publisher = Publisher(DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD)
 
     try:
         while True:
