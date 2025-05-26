@@ -2,7 +2,7 @@ import queue
 from dotenv import load_dotenv
 import os
 from .subscriber import Subscriber
-from .validation import SceneChangeEventValidator
+from events import SceneChangeEventValidator
 from .strings import MESSAGES
 
 def main():

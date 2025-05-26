@@ -1,6 +1,6 @@
 import json
 import paho.mqtt.client as mqtt
-from .validation import EventValidator
+from events import EventValidator
 from .strings import MESSAGES
 
 class Subscriber:
