@@ -17,8 +17,8 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{ include = "nfc", from = "src" }]
-scripts = { nfc = "nfc.__main__:main" }
+packages = [{ include = "nfc", from = "src" }, { include = "write_scene", from = "utils" }]
+scripts = { nfc = "nfc.__main__:main", write = "write_scene.__main__:main" }
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
