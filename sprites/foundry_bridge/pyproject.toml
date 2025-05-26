@@ -1,0 +1,22 @@
+[project]
+name = "foundry-bridge"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ian King",email = "ian.antking@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "paho-mqtt (>=2.1.0,<3.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "foundry_bridge", from = "src"}]
+scripts = { foundry_bridge = "foundry_bridge.__main__:main" }
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
