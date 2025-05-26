@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 from .subscriber import Subscriber
 from events import SceneChangeEventValidator
+from .keyboard import KeyboardManager
+from .scene_map import SCENE_MAP
 from .strings import MESSAGES
 
 def main():
@@ -19,10 +21,12 @@ def main():
     q = queue.Queue()
     subscriber = Subscriber(DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD, DRUID_TOPIC, q, SceneChangeEventValidator())
 
+    keyboard = KeyboardManager(SCENE_MAP)
+
     try:
         while True:
             message = q.get()
-            print("Received message:", message)
+            keyboard.handle_scene_change(message)
     except KeyboardInterrupt:
         print("Shutting down...")
         subscriber.close()

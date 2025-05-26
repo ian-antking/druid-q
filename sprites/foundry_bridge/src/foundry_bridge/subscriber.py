@@ -9,7 +9,7 @@ class Subscriber:
 
         self.topic = topic
         self.queue = queue
-        self.validator = validator  # save validator
+        self.validator = validator
 
         self.client = mqtt.Client(transport="websockets")
         self.client.username_pw_set(username, password)
@@ -32,14 +32,11 @@ class Subscriber:
             payload = json.loads(msg.payload.decode())
         except json.JSONDecodeError:
             print("Received non-JSON payload")
-            return  # or handle as needed
+            return 
 
         if self.validator.run(payload):
             event_obj = self.validator.parse(payload) if hasattr(self.validator, "parse") else payload
-            self.queue.put({
-                "topic": msg.topic,
-                "message": event_obj
-            })
+            self.queue.put(event_obj)
         else:
             print(f"Invalid message payload on topic {msg.topic}: {payload}")
 
