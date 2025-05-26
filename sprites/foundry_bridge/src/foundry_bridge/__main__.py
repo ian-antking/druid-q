@@ -2,6 +2,7 @@ import queue
 from dotenv import load_dotenv
 import os
 from .subscriber import Subscriber
+from .validation import SceneChangeEventValidator
 from .strings import MESSAGES
 
 def main():
@@ -16,7 +17,7 @@ def main():
         raise EnvironmentError(MESSAGES["missing_env_error"])
 
     q = queue.Queue()
-    subscriber = Subscriber(DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD, DRUID_TOPIC, q)
+    subscriber = Subscriber(DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD, DRUID_TOPIC, q, SceneChangeEventValidator())
 
     try:
         while True:

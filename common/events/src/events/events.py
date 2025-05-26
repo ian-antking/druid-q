@@ -20,3 +20,11 @@ class GameEvent(Event):
     def __init__(self, topic: str, message: str):
         super().__init__(type="game")
         self.payload = {"topic": topic, "message": message}
+
+@dataclass
+class SceneChangeEvent(Event):
+    scene: str
+
+    def __init__(self, scene: str):
+        super().__init__(type="scene")
+        self.scene = scene

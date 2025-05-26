@@ -1,13 +1,15 @@
 import json
 import paho.mqtt.client as mqtt
+from .validation import EventValidator
 from .strings import MESSAGES
 
 class Subscriber:
-    def __init__(self, host, username, password, topic, queue):
+    def __init__(self, host, username, password, topic, queue, validator: EventValidator):
         ws_path = "/ws"
 
         self.topic = topic
         self.queue = queue
+        self.validator = validator  # save validator
 
         self.client = mqtt.Client(transport="websockets")
         self.client.username_pw_set(username, password)
@@ -29,12 +31,17 @@ class Subscriber:
         try:
             payload = json.loads(msg.payload.decode())
         except json.JSONDecodeError:
-            payload = msg.payload.decode()
+            print("Received non-JSON payload")
+            return  # or handle as needed
 
-        self.queue.put({
-            "topic": msg.topic,
-            "message": payload
-        })
+        if self.validator.run(payload):
+            event_obj = self.validator.parse(payload) if hasattr(self.validator, "parse") else payload
+            self.queue.put({
+                "topic": msg.topic,
+                "message": event_obj
+            })
+        else:
+            print(f"Invalid message payload on topic {msg.topic}: {payload}")
 
     def close(self):
         self.client.loop_stop()
