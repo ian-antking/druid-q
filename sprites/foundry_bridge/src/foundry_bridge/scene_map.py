@@ -1,3 +1,4 @@
 SCENE_MAP = {
-    "aldwych": "1",
+    "landing": "2",
+    "aldwych": "2",
 }
