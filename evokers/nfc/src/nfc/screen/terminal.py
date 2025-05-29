@@ -9,8 +9,9 @@ from rich.live import Live
 from rich.theme import Theme
 from rich import box
 from events import Event, InfoEvent
+from .screen import Screen
 
-from .strings import MESSAGES
+from ..strings import MESSAGES
 
 custom_theme = Theme({
     "arcane": "bold magenta",
@@ -19,7 +20,7 @@ custom_theme = Theme({
     "info": "dim white",
 })
 
-class ScreenManager:
+class TerminalScreen(Screen):
     def __init__(self):
         self._event_queue = Queue()
         self._console = Console(theme=custom_theme)
