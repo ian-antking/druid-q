@@ -10,7 +10,8 @@ requires-python = ">=3.10"
 dependencies = [
     "paho-mqtt (>=2.1.0,<3.0.0)",
     "python-dotenv (>=1.1.0,<2.0.0)",
-    "pyautogui (>=0.9.54,<0.10.0)"
+    "pyautogui (>=0.9.54,<0.10.0)",
+    "subscriber @ file:///home/ian/Projects/druid-q/common/subscriber"
 ]
 
 [tool.poetry]

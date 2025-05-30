@@ -3,7 +3,7 @@ import os
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 from events import SceneChangeEventValidator
-from .subscriber import Subscriber
+from subscriber import Subscriber
 from .keyboard import KeyboardManager
 from .scene_map import SCENE_MAP
 from .strings import MESSAGES
