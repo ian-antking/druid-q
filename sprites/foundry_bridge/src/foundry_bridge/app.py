@@ -1,9 +1,9 @@
 class App:
-    def __init__(self, queue, subscriber, keyboardManager):
+    def __init__(self, queue, subscriber, keyboard_manager):
         self.queue = queue
 
         self.subscriber = subscriber
-        self.keyboard = keyboardManager
+        self.keyboard = keyboard_manager
 
     def run(self):
         try:
