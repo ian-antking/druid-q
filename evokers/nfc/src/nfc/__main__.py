@@ -1,13 +1,12 @@
 import queue
-from smartcard.System import readers
+import os
+import paho.mqtt.client as mqtt
 from smartcard.CardMonitoring import CardMonitor
+from dotenv import load_dotenv
 from .observer import NFCCardObserver
 from .publisher import Publisher
-from .screen import ScreenManager
-from events import InfoEvent, GameEvent
-from dotenv import load_dotenv
-import os
-
+from .screen import TerminalScreen
+from .app import App
 from .strings import MESSAGES
 
 load_dotenv()
@@ -20,41 +19,21 @@ if not (DRUID_HOST and DRUID_USERNAME and DRUID_PASSWORD):
     raise EnvironmentError(MESSAGES["missing_env_error"])
 
 def main():
-    r = readers()
-    screen = ScreenManager()
-    if not r:
-        screen.update(InfoEvent(MESSAGES["no_reader"]))
-        return
-
-    screen.update(InfoEvent(MESSAGES["available_readers"].format(readers=r)))
-
-    card_monitor = CardMonitor()
+    screen = TerminalScreen()
     event_queue = queue.Queue()
     observer = NFCCardObserver(event_queue=event_queue)
-    card_monitor.addObserver(observer)
+    monitor = CardMonitor()
+    
+    client = mqtt.Client(transport="websockets")
+    client.username_pw_set(DRUID_USERNAME, DRUID_PASSWORD)
+    client.ws_set_options(path="/ws")
+    client.tls_set()
+    client.connect(DRUID_HOST, 443)
+    
+    publisher = Publisher(client)
 
-    publisher = Publisher(DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD)
-
-    try:
-        while True:
-            try:
-                event = event_queue.get(timeout=1)
-
-                if isinstance(event, GameEvent):
-                    publisher.publish(event.payload)
-                    screen.update(InfoEvent(MESSAGES["published_event"].format(event=event.payload)))
-                else:
-                    screen.update(event)
-
-            except queue.Empty:
-                pass
-
-    except KeyboardInterrupt:
-        screen.update(InfoEvent(MESSAGES["user_interrupt"]))
-    finally:
-        card_monitor.deleteObserver(observer)
-        publisher.close()
-        screen.stop()
+    app = App(screen, event_queue, observer, publisher, monitor)
+    app.run()
 
 if __name__ == "__main__":
     main()
