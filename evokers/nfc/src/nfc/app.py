@@ -1,10 +1,9 @@
 import queue
-import os
 from smartcard.System import readers
 from smartcard.CardMonitoring import CardMonitor
 from events import InfoEvent, GameEvent
 from .observer import CardObserver
-from .publisher import Publisher
+from publisher import Publisher
 from .screen import Screen
 from .strings import MESSAGES
 

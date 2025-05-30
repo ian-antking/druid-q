@@ -4,7 +4,7 @@ import paho.mqtt.client as mqtt
 from smartcard.CardMonitoring import CardMonitor
 from dotenv import load_dotenv
 from .observer import NFCCardObserver
-from .publisher import Publisher
+from publisher import Publisher
 from .screen import TerminalScreen
 from .app import App
 from .strings import MESSAGES

@@ -14,7 +14,8 @@ dependencies = [
     "ndeflib (>=0.3.3,<0.4.0)",
     "python-dotenv (>=1.1.0,<2.0.0)",
     "rich (>=14.0.0,<15.0.0)",
-    "events @ file:///home/ian/Projects/druid-q/common/events"
+    "events @ file:///home/ian/Projects/druid-q/common/events",
+    "publisher @ file:///home/ian/Projects/druid-q/common/publisher"
 ]
 
 [tool.poetry]

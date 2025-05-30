@@ -79,6 +79,23 @@ files = [
 proxy = ["pysocks"]
 
 [[package]]
+name = "publisher"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = []
+develop = false
+
+[package.dependencies]
+paho-mqtt = ">=2.1.0,<3.0.0"
+
+[package.source]
+type = "directory"
+url = "../../common/publisher"
+
+[[package]]
 name = "pygments"
 version = "2.19.1"
 description = "Pygments is a syntax highlighting package written in Python."
@@ -175,4 +192,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10"
-content-hash = "230a25433b04fff827698c2863f1254c9e245b2077976be047fde2ffd1289756"
+content-hash = "6fbdbfd43afa1818c21dc3d2236483c20b09552bf420ea97a69a50760c9b47e2"
