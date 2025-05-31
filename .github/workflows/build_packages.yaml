@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'common/events/pyproject.toml'
+      - 'common/publisher/pyproject.toml'
+
+  workflow_dispatch:
 
 jobs:
   build-packages:
