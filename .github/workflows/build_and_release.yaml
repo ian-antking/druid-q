@@ -2,12 +2,8 @@ name: Build and Release Wheels
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'common/events/pyproject.toml'
-      - 'common/publisher/pyproject.toml'
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 jobs:
   build-packages:
