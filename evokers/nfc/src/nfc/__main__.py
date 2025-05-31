@@ -6,7 +6,7 @@ from smartcard.CardMonitoring import CardMonitor
 from dotenv import load_dotenv
 from .observer import NFCCardObserver
 from publisher import Publisher
-from .screen import TerminalScreen
+from .screen import TerminalScreen, DisplayHatScreen
 from .app import App
 from .strings import MESSAGES
 
@@ -25,7 +25,7 @@ def main():
     args = parser.parse_args()
 
     if args.display_hat:
-        raise NotImplementedError("Display Hat support is not implemented yet.")
+        screen = DisplayHatScreen()
     else:
         screen = TerminalScreen()
 
