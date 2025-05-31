@@ -29,7 +29,6 @@ def main():
     else:
         screen = TerminalScreen()
 
-    screen = TerminalScreen()
     event_queue = queue.Queue()
     observer = NFCCardObserver(event_queue=event_queue)
     monitor = CardMonitor()
