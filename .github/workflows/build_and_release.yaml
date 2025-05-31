@@ -40,10 +40,3 @@ jobs:
           body: Automated release of ${{ steps.extract.outputs.package }} wheel.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload wheel to release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./common/${{ steps.extract.outputs.package }}/dist/*.whl
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
