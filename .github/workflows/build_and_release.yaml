@@ -3,35 +3,36 @@ name: Build and Release Wheels
 on:
   push:
     tags:
-      - 'v*'
+      - 'events-v*'
+      - 'publisher-v*'
+      - 'subscriber-v*'
 
 jobs:
   build-packages:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package:
-          - events
-          - publisher
-    outputs:
-      # Pass artifact names for downstream job
-      artifact-name: ${{ matrix.package }}-wheel
+        package: [events, publisher, subscriber]
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
+      - name: Extract package name from tag
+        id: extract
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PACKAGE=${TAG%%-*}
+          echo "package=$PACKAGE" >> $GITHUB_OUTPUT
 
       - name: Build ${{ matrix.package }} wheel
+        if: matrix.package == steps.extract.outputs.package
         working-directory: ./common/${{ matrix.package }}
         run: |
           python -m pip install --upgrade build
           python -m build --wheel
 
       - name: Upload wheel artifact
+        if: matrix.package == steps.extract.outputs.package
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-wheel
@@ -42,17 +43,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download events wheel
-        uses: actions/download-artifact@v4
-        with:
-          name: events-wheel
-          path: ./dist/events
+      - name: Extract package name from tag
+        id: extract
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          PACKAGE=${TAG%%-*}
+          echo "package=$PACKAGE" >> $GITHUB_OUTPUT
 
-      - name: Download publisher wheel
+      - name: Download ${{ steps.extract.outputs.package }} wheel
         uses: actions/download-artifact@v4
         with:
-          name: publisher-wheel
-          path: ./dist/publisher
+          name: ${{ steps.extract.outputs.package }}-wheel
+          path: ./dist/${{ steps.extract.outputs.package }}
 
       - name: Create or update GitHub Release
         id: create_release
@@ -60,15 +62,13 @@ jobs:
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
-          body: Automated release of built wheels.
+          body: Automated release of ${{ steps.extract.outputs.package }} wheel.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload wheels to Release
+      - name: Upload wheel to Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            ./dist/events/*.whl
-            ./dist/publisher/*.whl
+          files: ./dist/${{ steps.extract.outputs.package }}/*.whl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
