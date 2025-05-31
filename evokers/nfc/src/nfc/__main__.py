@@ -1,3 +1,4 @@
+import argparse
 import queue
 import os
 import paho.mqtt.client as mqtt
@@ -19,6 +20,15 @@ if not (DRUID_HOST and DRUID_USERNAME and DRUID_PASSWORD):
     raise EnvironmentError(MESSAGES["missing_env_error"])
 
 def main():
+    parser = argparse.ArgumentParser(description="Run the NFC Scene Controller")
+    parser.add_argument("--display-hat", action="store_true", help="Use Display Hat Mini instead of terminal")
+    args = parser.parse_args()
+
+    if args.display_hat:
+        raise NotImplementedError("Display Hat support is not implemented yet.")
+    else:
+        screen = TerminalScreen()
+
     screen = TerminalScreen()
     event_queue = queue.Queue()
     observer = NFCCardObserver(event_queue=event_queue)
