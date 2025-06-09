@@ -2,19 +2,16 @@ import queue
 from smartcard.System import readers
 from smartcard.CardMonitoring import CardMonitor
 from events import InfoEvent, GameEvent
-from .observer import CardObserver
-from publisher import Publisher
-from .screen import Screen
 from .strings import MESSAGES
 
 class App:
     def __init__(
         self,
-        screen: Screen,
+        screen,
         event_queue: queue.Queue,
-        observer: CardObserver,
-        publisher: Publisher,
-        monitor: CardMonitor,
+        observer,
+        publisher,
+        monitor: CardMonitor = None,
     ):
         self.screen = screen
         self.event_queue = event_queue
@@ -24,12 +21,17 @@ class App:
 
     def run(self):
         readers_list = readers()
-        if not readers_list:
+        if not readers_list and self.card_monitor is not None:
             self.screen.update(InfoEvent(MESSAGES["no_reader"]))
             return
 
-        self.screen.update(InfoEvent(MESSAGES["available_readers"].format(readers=readers_list)))
-        self.card_monitor.addObserver(self.observer)
+        if self.card_monitor is not None:
+            self.screen.update(InfoEvent(MESSAGES["available_readers"].format(readers=readers_list)))
+            self.card_monitor.addObserver(self.observer)
+
+        # Start the observer if it has a start method (e.g., PN532Observer)
+        if hasattr(self.observer, "start") and callable(self.observer.start):
+            self.observer.start()
 
         try:
             while True:
@@ -45,6 +47,12 @@ class App:
         except KeyboardInterrupt:
             self.screen.update(InfoEvent(MESSAGES["user_interrupt"]))
         finally:
-            self.card_monitor.deleteObserver(self.observer)
+            # Stop the observer if it has a stop method
+            if hasattr(self.observer, "stop") and callable(self.observer.stop):
+                self.observer.stop()
+
+            if self.card_monitor is not None:
+                self.card_monitor.deleteObserver(self.observer)
+
             self.publisher.close()
             self.screen.stop()
