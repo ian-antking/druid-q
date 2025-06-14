@@ -10,13 +10,6 @@ class App:
         self.publisher = publisher
 
     def run(self):
-        from smartcard.System import readers
-        readers_list = readers()
-        if not readers_list:
-            self.screen.update(InfoEvent(MESSAGES["no_reader"]))
-            return
-        self.screen.update(InfoEvent(MESSAGES["available_readers"].format(readers=readers_list)))
-
         try:
             while True:
                 try:

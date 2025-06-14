@@ -2,7 +2,7 @@ import board
 import busio
 import threading
 import json
-import time
+import time # Make sure time is imported
 import ndef
 from adafruit_pn532.i2c import PN532_I2C
 
@@ -19,10 +19,13 @@ class PN532(Observer):
         self.running = True
         self._last_uid = None
 
-        # I2C setup for Raspberry Pi
         i2c = busio.I2C(board.SCL, board.SDA)
+        time.sleep(0.1) # Add a small delay here (e.g., 100ms)
         self.pn532 = PN532_I2C(i2c, debug=False)
-        self.pn532.SAM_configuration()
+        # The SAM_configuration is called within PN532_I2C's __init__ via reset() and _wakeup()
+        # self.pn532.SAM_configuration() # This line is often redundant as it's called internally
+                                        # unless you want to reconfigure it.
+                                        # The traceback shows it failing on the *first* internal call.
 
         self._thread = threading.Thread(target=self._poll_loop, daemon=True)
         self._thread.start()
@@ -59,25 +62,34 @@ class PN532(Observer):
             for page in range(4, 40):
                 try:
                     data = self.pn532.ntag2xx_read_block(page)
-                    if data:
+                    if data is not None:  # Explicitly check for None
                         raw_data.extend(data)
                     else:
-                        self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="N/A", sw2="N/A")))
+                        self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="READ_FAIL", sw2="No data returned")))
                         return
                 except Exception as e:
-                    self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="EXC", sw2=str(e))))
+                    self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="EXCEPTION", sw2=str(e))))
                     return
-
+                
+    # ... (inside update method, after the page reading loop)
+            print(f"Raw data read from card: {raw_data.hex()}") # Print hex for readability
+            # Or for a more detailed view:
+            # print(f"Raw data read from card: {list(raw_data)}")
+    # ...
+            
+# ... (inside update method, after ndef_bytes assignment)
             try:
                 ndef_start = raw_data.index(0x03)
                 length = raw_data[ndef_start + 1]
                 ndef_bytes = bytes(raw_data[ndef_start + 2 : ndef_start + 2 + length])
+                print(f"NDEF Start: {ndef_start}, Length: {length}, NDEF Bytes: {ndef_bytes.hex()}")
             except ValueError:
                 self.emit(InfoEvent(MESSAGES["no_ndef"]))
                 return
             except IndexError:
                 self.emit(InfoEvent(MESSAGES["ndef_too_long"]))
                 return
+# ...
 
             try:
                 ndef_records = list(ndef.message_decoder(ndef_bytes))

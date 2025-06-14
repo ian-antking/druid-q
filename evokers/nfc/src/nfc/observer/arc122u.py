@@ -6,13 +6,22 @@ import ndef
 from events import InfoEvent, GameEvent
 from nfc.strings import MESSAGES
 from smartcard.CardMonitoring import CardMonitor
+from smartcard.System import readers
 
 class ARC122U(Observer):
-    def __init__(self, event_queue=None, monitor: CardMonitor = None):
+    def __init__(self, event_queue=None):
         super().__init__(event_queue)
         self.card_processed = threading.Event()
-        self.monitor = monitor or CardMonitor()
+        self.monitor = CardMonitor()
+        self.readers = readers() # This correctly gets the list of readers
+
+        # CORRECTED LINE: Check the length of self.readers, not the function 'readers'
+        if self.readers is None or len(self.readers) == 0:
+            self.emit(InfoEvent(MESSAGES["no_reader"]))
+            raise RuntimeError("No smartcard readers found for ARC122U")
+
         self.monitor.addObserver(self)
+
 
     def stop(self):
         self.monitor.deleteObserver(self)
