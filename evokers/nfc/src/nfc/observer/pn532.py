@@ -1,58 +1,86 @@
+import board
+import busio
 import threading
 import json
-import queue
 import time
+import ndef
+from adafruit_pn532.i2c import PN532_I2C
+
 from events import InfoEvent, GameEvent
-from .strings import MESSAGES
-from .observer import CardObserver  # keep the same base class for interface parity
+from .observer import Observer
+from nfc.strings import MESSAGES
 
-# Import Waveshare PN532 library
-from pn532 import PN532_SPI  # or PN532_I2C, PN532_UART depending on your connection
 
-class PN532(CardObserver):
-    def __init__(self, event_queue=None, spi_bus=0, spi_device=0, gpio_cs=22, gpio_reset=18):
-        super().__init__()
-        self.event_queue = event_queue or queue.Queue()
+class PN532(Observer):
+    def __init__(self, event_queue=None, poll_interval=0.5):
+        super().__init__(event_queue)
         self.card_processed = threading.Event()
-        self._stop_event = threading.Event()
+        self.poll_interval = poll_interval
+        self.running = True
+        self._last_uid = None
 
-        # Initialize PN532 over SPI (adjust pins/bus/device as needed)
-        self.pn532 = PN532_SPI(cs=gpio_cs, reset=gpio_reset, bus=spi_bus, device=spi_device)
+        # I2C setup for Raspberry Pi
+        i2c = busio.I2C(board.SCL, board.SDA)
+        self.pn532 = PN532_I2C(i2c, debug=False)
         self.pn532.SAM_configuration()
 
-        # Thread to poll cards
-        self.thread = threading.Thread(target=self._poll_cards, daemon=True)
+        self._thread = threading.Thread(target=self._poll_loop, daemon=True)
+        self._thread.start()
 
     def emit(self, event):
         self.event_queue.put(event)
 
-    def start(self):
-        self._stop_event.clear()
-        self.thread.start()
-
-    def stop(self):
-        self._stop_event.set()
-        self.thread.join()
-
-    def _poll_cards(self):
-        self.emit(InfoEvent(MESSAGES["waiting_for_card"]))
-        while not self._stop_event.is_set():
+    def _poll_loop(self):
+        while self.running:
             uid = self.pn532.read_passive_target(timeout=0.5)
-            if uid is None:
-                continue
 
+            added = []
+            removed = []
+
+            if uid:
+                if uid != self._last_uid:
+                    added.append(uid)
+            elif self._last_uid:
+                removed.append(self._last_uid)
+
+            if added or removed:
+                self.update(None, (added, removed))
+
+            self._last_uid = uid
+            time.sleep(self.poll_interval)
+
+    def update(self, _, cards):
+        added_cards, removed_cards = cards
+
+        for uid in added_cards:
             self.emit(InfoEvent(MESSAGES["card_inserted"]))
+
+            raw_data = bytearray()
+            for page in range(4, 40):
+                try:
+                    data = self.pn532.ntag2xx_read_block(page)
+                    if data:
+                        raw_data.extend(data)
+                    else:
+                        self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="N/A", sw2="N/A")))
+                        return
+                except Exception as e:
+                    self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="EXC", sw2=str(e))))
+                    return
+
             try:
-                # Read NDEF data from the card
-                ndef_data = self._read_ndef()
-                if not ndef_data:
-                    self.emit(InfoEvent(MESSAGES["no_ndef"]))
-                    continue
+                ndef_start = raw_data.index(0x03)
+                length = raw_data[ndef_start + 1]
+                ndef_bytes = bytes(raw_data[ndef_start + 2 : ndef_start + 2 + length])
+            except ValueError:
+                self.emit(InfoEvent(MESSAGES["no_ndef"]))
+                return
+            except IndexError:
+                self.emit(InfoEvent(MESSAGES["ndef_too_long"]))
+                return
 
-                # Decode NDEF message
-                ndef_records = list(ndef.message_decoder(ndef_data))
-                found_json = False
-
+            try:
+                ndef_records = list(ndef.message_decoder(ndef_bytes))
                 for record in ndef_records:
                     rtype = record.type
                     if isinstance(rtype, bytes):
@@ -64,53 +92,17 @@ class PN532(CardObserver):
                             parsed = json.loads(json_payload)
                             self.emit(InfoEvent(MESSAGES["decoded_json"]))
                             self.emit(GameEvent(parsed["topic"], parsed["message"]))
-                            found_json = True
-                            self.card_processed.set()
-                            break
                         except json.JSONDecodeError:
                             self.emit(InfoEvent(MESSAGES["invalid_json"].format(payload=json_payload)))
-
-                if not found_json:
-                    self.emit(InfoEvent(MESSAGES["no_json_record"]))
-
+                        self.card_processed.set()
+                        return
+                self.emit(InfoEvent(MESSAGES["no_json_record"]))
             except Exception as e:
                 self.emit(InfoEvent(MESSAGES["failed_decode"].format(error=e)))
 
+        for _ in removed_cards:
             self.emit(InfoEvent(MESSAGES["card_removed"]))
-            # Small delay to debounce multiple reads of same card
-            time.sleep(1)
 
-    def _read_ndef(self):
-        """
-        Read NDEF data from the PN532 card.
-        This will depend on card type and how to read the memory.
-        For simplicity, we’ll try to read pages 4-39 like ARC122U did.
-        """
-
-        raw_data = []
-
-        try:
-            # Read pages 4-39, 16 bytes each
-            for page in range(4, 40, 4):
-                # PN532 read command depends on card type, but PN532_SPI.read_mifare_block() can help
-                # Read four blocks (4 bytes each) to make 16 bytes total
-                for block in range(page, page + 4):
-                    data = self.pn532.read_mifare_block(block)
-                    if data is None:
-                        self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=block, sw1="None", sw2="None")))
-                        return None
-                    raw_data.extend(data)
-
-            # Locate NDEF TLV 0x03
-            ndef_start = raw_data.index(0x03)
-            length = raw_data[ndef_start + 1]
-            ndef_bytes = bytes(raw_data[ndef_start + 2 : ndef_start + 2 + length])
-            return ndef_bytes
-        except ValueError:
-            self.emit(InfoEvent(MESSAGES["no_ndef"]))
-        except IndexError:
-            self.emit(InfoEvent(MESSAGES["ndef_too_long"]))
-        except Exception as e:
-            self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page="unknown", sw1=type(e).__name__, sw2=str(e))))
-
-        return None
+    def stop(self):
+        self.running = False
+        self._thread.join()

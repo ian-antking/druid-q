@@ -2,7 +2,6 @@ import argparse
 import queue
 import os
 import paho.mqtt.client as mqtt
-from smartcard.CardMonitoring import CardMonitor
 from dotenv import load_dotenv
 
 from .observer import ARC122U, PN532
@@ -35,10 +34,8 @@ def main():
 
     if args.use_pn532:
         observer = PN532(event_queue=event_queue)
-        monitor = None  # No CardMonitor needed for PN532 polling
     else:
         observer = ARC122U(event_queue=event_queue)
-        monitor = CardMonitor()  # USB reader uses CardMonitor
 
     client = mqtt.Client(transport="websockets")
     client.username_pw_set(DRUID_USERNAME, DRUID_PASSWORD)
@@ -48,7 +45,13 @@ def main():
 
     publisher = Publisher(client)
 
-    app = App(screen, event_queue, observer, publisher, monitor)
+    app = App(
+        screen=screen,
+        event_queue=event_queue,
+        observer=observer,
+        publisher=publisher,
+    )
+
     app.run()
 
 if __name__ == "__main__":

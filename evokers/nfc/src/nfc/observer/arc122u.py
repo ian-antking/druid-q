@@ -1,17 +1,21 @@
 import threading
 import json
-import queue
-from .observer import CardObserver
+from .observer import Observer
 from smartcard.Exceptions import CardConnectionException
 import ndef
 from events import InfoEvent, GameEvent
-from .strings import MESSAGES
+from nfc.strings import MESSAGES
+from smartcard.CardMonitoring import CardMonitor
 
-class ARC122U(CardObserver):
-
-    def __init__(self, event_queue=None):
+class ARC122U(Observer):
+    def __init__(self, event_queue=None, monitor: CardMonitor = None):
         super().__init__(event_queue)
         self.card_processed = threading.Event()
+        self.monitor = monitor or CardMonitor()
+        self.monitor.addObserver(self)
+
+    def stop(self):
+        self.monitor.deleteObserver(self)
 
     def emit(self, event):
         self.event_queue.put(event)
