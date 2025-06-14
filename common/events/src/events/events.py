@@ -1,9 +1,9 @@
 from dataclasses import dataclass
-from typing import Literal, Union, Dict
+from typing import Literal, Dict
 
 @dataclass
 class Event:
-    type: Literal["info", "game"]
+    type: Literal["info", "game", "scene"]
 
 @dataclass
 class InfoEvent(Event):
@@ -24,7 +24,9 @@ class GameEvent(Event):
 @dataclass
 class SceneChangeEvent(Event):
     scene: str
+    description: str  # <--- add this
 
-    def __init__(self, scene: str):
+    def __init__(self, scene: str, description: str):
         super().__init__(type="scene")
         self.scene = scene
+        self.description = description
