@@ -2,7 +2,7 @@ import board
 import busio
 import threading
 import json
-import time # Make sure time is imported
+import time
 import ndef
 from adafruit_pn532.i2c import PN532_I2C
 
@@ -20,12 +20,7 @@ class PN532(Observer):
         self._last_uid = None
 
         i2c = busio.I2C(board.SCL, board.SDA)
-        time.sleep(0.1) # Add a small delay here (e.g., 100ms)
         self.pn532 = PN532_I2C(i2c, debug=False)
-        # The SAM_configuration is called within PN532_I2C's __init__ via reset() and _wakeup()
-        # self.pn532.SAM_configuration() # This line is often redundant as it's called internally
-                                        # unless you want to reconfigure it.
-                                        # The traceback shows it failing on the *first* internal call.
 
         self._thread = threading.Thread(target=self._poll_loop, daemon=True)
         self._thread.start()
@@ -62,7 +57,7 @@ class PN532(Observer):
             for page in range(4, 40):
                 try:
                     data = self.pn532.ntag2xx_read_block(page)
-                    if data is not None:  # Explicitly check for None
+                    if data is not None:
                         raw_data.extend(data)
                     else:
                         self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="READ_FAIL", sw2="No data returned")))
@@ -71,13 +66,8 @@ class PN532(Observer):
                     self.emit(InfoEvent(MESSAGES["failed_read_page"].format(page=page, sw1="EXCEPTION", sw2=str(e))))
                     return
                 
-    # ... (inside update method, after the page reading loop)
-            print(f"Raw data read from card: {raw_data.hex()}") # Print hex for readability
-            # Or for a more detailed view:
-            # print(f"Raw data read from card: {list(raw_data)}")
-    # ...
-            
-# ... (inside update method, after ndef_bytes assignment)
+            print(f"Raw data read from card: {raw_data.hex()}")
+
             try:
                 ndef_start = raw_data.index(0x03)
                 length = raw_data[ndef_start + 1]
@@ -89,7 +79,6 @@ class PN532(Observer):
             except IndexError:
                 self.emit(InfoEvent(MESSAGES["ndef_too_long"]))
                 return
-# ...
 
             try:
                 ndef_records = list(ndef.message_decoder(ndef_bytes))

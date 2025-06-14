@@ -14,6 +14,7 @@ class App:
             while True:
                 try:
                     event = self.event_queue.get(timeout=1)
+                    print(f"Got event from queue: {event}")
                     if isinstance(event, GameEvent):
                         self.publisher.publish(event.payload)
                         self.screen.update(InfoEvent(MESSAGES["published_event"].format(event=event.payload)))
