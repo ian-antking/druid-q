@@ -1,17 +1,30 @@
 import threading
 import json
-import queue
+from .observer import Observer
 from smartcard.Exceptions import CardConnectionException
-from smartcard.CardMonitoring import CardObserver
 import ndef
 from events import InfoEvent, GameEvent
-from .strings import MESSAGES
+from nfc.strings import MESSAGES
+from smartcard.CardMonitoring import CardMonitor
+from smartcard.System import readers
 
-class NFCCardObserver(CardObserver):
-
+class ARC122U(Observer):
     def __init__(self, event_queue=None):
+        super().__init__(event_queue)
         self.card_processed = threading.Event()
-        self.event_queue = event_queue or queue.Queue()
+        self.monitor = CardMonitor()
+        self.readers = readers() # This correctly gets the list of readers
+
+        # CORRECTED LINE: Check the length of self.readers, not the function 'readers'
+        if self.readers is None or len(self.readers) == 0:
+            self.emit(InfoEvent(MESSAGES["no_reader"]))
+            raise RuntimeError("No smartcard readers found for ARC122U")
+
+        self.monitor.addObserver(self)
+
+
+    def stop(self):
+        self.monitor.deleteObserver(self)
 
     def emit(self, event):
         self.event_queue.put(event)
