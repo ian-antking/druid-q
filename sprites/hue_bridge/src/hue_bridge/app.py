@@ -1,4 +1,5 @@
 import json
+from dataclasses import asdict
 
 class App:
     def __init__(self, queue, subscriber, redis_client):
@@ -12,7 +13,7 @@ class App:
                 message = self.queue.get()
                 print(message, flush=True)
                 try:
-                    self.redis.rpush("last_event", json.dumps(message))
+                    self.redis("latest_scene", json.dumps(asdict(message)))
                 except Exception as e:
                     print(f"Redis error: {e}", flush=True)
         except KeyboardInterrupt:
