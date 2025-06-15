@@ -35,7 +35,7 @@ def main():
     else:
         observer = ACR122U(event_queue=event_queue)
 
-    client = mqtt.Client(transport="websockets")
+    client = mqtt.Client(protocol=mqtt.MQTTv311, transport="websockets")
     client.username_pw_set(DRUID_USERNAME, DRUID_PASSWORD)
     client.ws_set_options(path="/ws")
     client.tls_set()

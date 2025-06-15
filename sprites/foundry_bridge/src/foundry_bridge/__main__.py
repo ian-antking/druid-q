@@ -22,7 +22,7 @@ if not (DRUID_HOST and DRUID_USERNAME and DRUID_PASSWORD and DRUID_TOPIC):
 def main():
     q = queue.Queue()
 
-    client = mqtt.Client(transport="websockets")
+    client = mqtt.Client(protocol=mqtt.MQTTv311, transport="websockets")
     client.username_pw_set(DRUID_USERNAME, DRUID_PASSWORD)
     client.ws_set_options(path="/ws")
     client.tls_set()
