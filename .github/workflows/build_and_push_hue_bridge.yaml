@@ -1,0 +1,45 @@
+name: Build and Push Hue Bridge
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from tag or use manual input
+        id: vars
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "VERSION=dev-manual" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          fi
+
+      - name: Build and push multi-arch Docker image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: sprites/hue_bridge/Dockerfile
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/hue-bridge:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/hue-bridge:latest
