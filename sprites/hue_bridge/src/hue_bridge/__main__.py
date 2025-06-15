@@ -4,8 +4,6 @@ import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 from events import SceneChangeEventValidator
 from subscriber import Subscriber
-from .keyboard import KeyboardManager
-from .scene_map import SCENE_MAP
 from .strings import MESSAGES
 from .app import App 
 
@@ -29,9 +27,7 @@ def main():
     client.connect(DRUID_HOST, 443)
 
     subscriber = Subscriber(client, DRUID_TOPIC, q, SceneChangeEventValidator())
-    keyboard = KeyboardManager(SCENE_MAP)
-
-    app = App(queue=q, subscriber=subscriber, keyboard_manager=keyboard)
+    app = App(queue=q, subscriber=subscriber)
     app.run()
 
 if __name__ == "__main__":

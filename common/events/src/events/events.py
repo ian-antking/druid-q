@@ -3,7 +3,7 @@ from typing import Literal, Dict
 
 @dataclass
 class Event:
-    type: Literal["info", "game", "scene"]
+    type: Literal["info", "game", "scene", "card"]
 
 @dataclass
 class InfoEvent(Event):
@@ -24,7 +24,7 @@ class GameEvent(Event):
 @dataclass
 class SceneChangeEvent(Event):
     scene: str
-    description: str  # <--- add this
+    description: str 
 
     def __init__(self, scene: str, description: str):
         super().__init__(type="scene")
