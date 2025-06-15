@@ -1,14 +1,17 @@
 import argparse
+from pathlib import Path
 import queue
 import os
 import paho.mqtt.client as mqtt
 from dotenv import load_dotenv
 
-from .observer import ARC122U, PN532
+from .observer import ACR122U, PN532
 from publisher import Publisher
 from .screen import TerminalScreen
 from .app import App
 from .strings import MESSAGES
+
+from .scene_store import JsonSceneStore
 
 load_dotenv()
 
@@ -25,13 +28,12 @@ def main():
     args = parser.parse_args()
 
     screen = TerminalScreen()
-
     event_queue = queue.Queue()
 
     if args.use_pn532:
         observer = PN532(event_queue=event_queue)
     else:
-        observer = ARC122U(event_queue=event_queue)
+        observer = ACR122U(event_queue=event_queue)
 
     client = mqtt.Client(transport="websockets")
     client.username_pw_set(DRUID_USERNAME, DRUID_PASSWORD)
@@ -41,11 +43,17 @@ def main():
 
     publisher = Publisher(client)
 
+    BASE_DIR = Path(__file__).resolve().parents[2]
+    scene_file = BASE_DIR / "scenes.json"
+
+    scene_store = JsonSceneStore(scene_file)
+
     app = App(
         screen=screen,
         event_queue=event_queue,
         observer=observer,
         publisher=publisher,
+        scene_store=scene_store,
     )
 
     app.run()

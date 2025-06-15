@@ -1,4 +1,4 @@
-from .events import Event, InfoEvent, GameEvent, SceneChangeEvent
+from .events import Event, InfoEvent, GameEvent, SceneChangeEvent, CardReadEvent
 from .validation import EventValidator, SceneChangeEventValidator
 
 __all__ = [
@@ -8,4 +8,5 @@ __all__ = [
     "SceneChangeEvent",
     "EventValidator",
     "SceneChangeEventValidator",
+    "CardReadEvent"
 ]

@@ -30,3 +30,11 @@ class SceneChangeEvent(Event):
         super().__init__(type="scene")
         self.scene = scene
         self.description = description
+
+@dataclass
+class CardReadEvent(Event):
+    uid: str
+
+    def __init__(self, uid: str):
+        super().__init__(type="card")
+        self.uid = uid

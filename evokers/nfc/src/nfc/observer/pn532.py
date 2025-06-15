@@ -4,10 +4,9 @@ import threading
 import time
 from adafruit_pn532.i2c import PN532_I2C
 
-from events import InfoEvent, GameEvent
+from events import InfoEvent, CardReadEvent
 from .observer import Observer
-from nfc.strings import MESSAGES
-from .library import library
+
 
 class PN532(Observer):
     def __init__(self, event_queue=None, poll_interval=0.5):
@@ -27,19 +26,7 @@ class PN532(Observer):
 
     def update(self, uid_hex):
         self.emit(InfoEvent(f"📡 Card inserted (UID: {uid_hex})"))
-
-        entry = library.get(uid_hex)
-        if not entry:
-            self.emit(InfoEvent("❌ Unknown card. No scene found."))
-            return
-
-        topic = entry.get("topic")
-        message = entry.get("message")
-
-        if topic and message:
-            self.emit(GameEvent(topic, message))
-        else:
-            self.emit(InfoEvent("❌ Invalid entry format."))
+        self.emit(CardReadEvent(uid_hex))
 
     def _poll_loop(self):
         while self.running:
