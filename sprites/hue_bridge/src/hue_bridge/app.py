@@ -13,7 +13,7 @@ class App:
                 message = self.queue.get()
                 print(message, flush=True)
                 try:
-                    self.redis("latest_scene", json.dumps(asdict(message)))
+                    self.redis.set("latest_scene", json.dumps(asdict(message)))
                 except Exception as e:
                     print(f"Redis error: {e}", flush=True)
         except KeyboardInterrupt:

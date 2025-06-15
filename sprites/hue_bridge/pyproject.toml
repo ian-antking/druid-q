@@ -1,6 +1,6 @@
 [project]
 name = "hue-bridge"
-version = "0.1.9"
+version = "0.1.10"
 description = ""
 authors = [
     {name = "Ian King",email = "ian.antking@gmail.com"}
