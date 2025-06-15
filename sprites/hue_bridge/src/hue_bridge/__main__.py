@@ -17,7 +17,7 @@ DRUID_PASSWORD = os.getenv("DRUID_PASSWORD")
 DRUID_TOPIC = os.getenv("DRUID_TOPIC")
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_PORT = 6379
 
 if not all([DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD, DRUID_TOPIC]):
     raise EnvironmentError(MESSAGES["missing_env_error"])
