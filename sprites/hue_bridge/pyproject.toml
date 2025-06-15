@@ -8,6 +8,9 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "subscriber @ file:///home/ian/Projects/druid-q/common/subscriber",
+    "paho-mqtt (>=2.1.0,<3.0.0)",
+    "python-dotenv (>=1.1.0,<2.0.0)"
 ]
 
 [tool.poetry]
