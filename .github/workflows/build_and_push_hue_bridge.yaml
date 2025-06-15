@@ -27,11 +27,13 @@ jobs:
       - name: Extract version from tag or use manual input
         id: vars
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "VERSION=dev-manual" >> $GITHUB_ENV
-          else
-            echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
-          fi
+            else
+            # Strip 'hue-bridge-' prefix
+            VERSION="${GITHUB_REF#refs/tags/hue-bridge-}"
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            fi
 
       - name: Build and push multi-arch Docker image
         uses: docker/build-push-action@v4
