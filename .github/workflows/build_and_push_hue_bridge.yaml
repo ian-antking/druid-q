@@ -3,7 +3,7 @@ name: Build and Push Hue Bridge
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - 'hue-bridge-v*.*.*'
   workflow_dispatch:
 
 jobs:
