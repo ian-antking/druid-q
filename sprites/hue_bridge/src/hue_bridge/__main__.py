@@ -1,21 +1,25 @@
 import queue
 import os
 import paho.mqtt.client as mqtt
+import redis
 from dotenv import load_dotenv
 from events import SceneChangeEventValidator
 from subscriber import Subscriber
 from .strings import MESSAGES
-from .app import App 
+from .app import App
 
 load_dotenv()
 
 DRUID_HOST = os.getenv("DRUID_HOST")
-DRUID_PORT = int(os.getenv("DRUID_PORT", 443))  # Defaults to 443
+DRUID_PORT = int(os.getenv("DRUID_PORT", 443))
 DRUID_USERNAME = os.getenv("DRUID_USERNAME")
 DRUID_PASSWORD = os.getenv("DRUID_PASSWORD")
 DRUID_TOPIC = os.getenv("DRUID_TOPIC")
 
-if not (DRUID_HOST and DRUID_USERNAME and DRUID_PASSWORD and DRUID_TOPIC):
+REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+
+if not all([DRUID_HOST, DRUID_USERNAME, DRUID_PASSWORD, DRUID_TOPIC]):
     raise EnvironmentError(MESSAGES["missing_env_error"])
 
 def main():
@@ -26,12 +30,14 @@ def main():
     client.ws_set_options(path="/ws")
 
     if DRUID_PORT == 443:
-        client.tls_set()  
+        client.tls_set()
 
     client.connect(DRUID_HOST, DRUID_PORT)
 
+    redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+
     subscriber = Subscriber(client, DRUID_TOPIC, q, SceneChangeEventValidator())
-    app = App(queue=q, subscriber=subscriber)
+    app = App(queue=q, subscriber=subscriber, redis_client=redis_client)
     app.run()
 
 if __name__ == "__main__":
