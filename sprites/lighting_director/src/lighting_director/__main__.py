@@ -7,7 +7,7 @@ from events import SceneChangeEventValidator
 from subscriber import Subscriber
 from .strings import MESSAGES
 from .app import App
-from .scene_store import SceneStore  # ⬅️ new import
+from .scene_store import SceneStore
 
 load_dotenv()
 

@@ -23,8 +23,16 @@ class App:
                         print("Scene unchanged, skipping Redis write.", flush=True)
                         continue 
 
-                    self.scene_store.store_scene(b64_scene)
+                    self.scene_store.save_latest_scene(b64_scene)
                     print("Scene updated in Redis.", flush=True)
+
+                    scene_data = self.scene_store.get_cached_scene(b64_scene)
+
+                    if scene_data == None :
+                        print("TODO: get scene data from LLM")
+                        print("TODO: cache new scene data")
+
+                    self.scene_store.enqueue_scene(scene_data)
 
                 except Exception as e:
                     print(f"Error storing scene: {e}", flush=True)
