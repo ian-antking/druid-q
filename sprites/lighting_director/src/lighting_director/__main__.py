@@ -8,6 +8,7 @@ from subscriber import Subscriber
 from .strings import MESSAGES
 from .app import App
 from .scene_store import SceneStore
+from hue import get_lights_in_room, discover_bridge_ip
 
 load_dotenv()
 
@@ -16,6 +17,9 @@ DRUID_PORT = int(os.getenv("DRUID_PORT", 443))
 DRUID_USERNAME = os.getenv("DRUID_USERNAME")
 DRUID_PASSWORD = os.getenv("DRUID_PASSWORD")
 DRUID_TOPIC = os.getenv("DRUID_TOPIC")
+LLM_API_KEY = os.getenv("LLM_API_KEY")
+HUE_API_KEY = os.getenv("HUE_API_KEY")
+ROOM_NAME = os.getenv("ROOM_NAME")
 
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = 6379
@@ -37,6 +41,15 @@ def main():
 
     redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     scene_store = SceneStore(redis_client)
+
+    hue_ip = scene_store.get_hue_ip()
+
+    if hue_ip is None:
+        hue_ip = discover_bridge_ip()
+        scene_store.set_hue_ip(hue_ip)
+
+    room_data = get_lights_in_room(ROOM_NAME, HUE_API_KEY, hue_ip)
+    print(room_data)
 
     subscriber = Subscriber(client, DRUID_TOPIC, q, SceneChangeEventValidator())
     app = App(queue=q, subscriber=subscriber, scene_store=scene_store)

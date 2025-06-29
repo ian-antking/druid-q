@@ -6,13 +6,14 @@ authors = [
     {name = "Ian King",email = "ian.antking@gmail.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<4.0"
 dependencies = [
     "subscriber @ file:///home/ian/Projects/druid-q/common/subscriber",
     "paho-mqtt (>=2.1.0,<3.0.0)",
     "python-dotenv (>=1.1.0,<2.0.0)",
     "redis (>=6.2.0,<7.0.0)",
-    "events @ file:///home/ian/Projects/druid-q/common/events"
+    "events @ file:///home/ian/Projects/druid-q/common/events",
+    "python-hue-v2 (>=2.2.1,<3.0.0)"
 ]
 
 [tool.poetry]

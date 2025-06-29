@@ -4,6 +4,20 @@ class SceneStore:
     def __init__(self, redis_client):
         self.redis = redis_client
 
+    def get_hue_ip(self):
+        try:
+            return self.redis.get(f"hue_ip")
+        except Exception as e:
+            print(f"Redis error in get_hue_ip: {e}", flush=True)
+            return None
+
+    def set_hue_ip(self, hue_ip):
+        try:
+            self.redis.set("hue_ip", hue_ip)
+        except Exception as e:
+            print(f"Redis error in set_hue_ip: {e}", flush=True)
+
+
     def get_cached_scene(self, scene_id: str):
         try:
             return self.redis.get(f"lighting_scene:{scene_id}")
