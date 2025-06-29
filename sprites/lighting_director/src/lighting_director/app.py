@@ -17,7 +17,15 @@ class App:
                     json_bytes = json.dumps(asdict(message)).encode("utf-8")
                     b64_scene = base64.b64encode(json_bytes).decode("utf-8")
 
-                    self.scene_store.save_latest_scene(b64_scene)
+                    current_scene = self.scene_store.get_latest_scene()
+
+                    if current_scene == b64_scene:
+                        print("Scene unchanged, skipping Redis write.", flush=True)
+                        continue 
+
+                    self.scene_store.store_scene(b64_scene)
+                    print("Scene updated in Redis.", flush=True)
+
                 except Exception as e:
                     print(f"Error storing scene: {e}", flush=True)
         except KeyboardInterrupt:
