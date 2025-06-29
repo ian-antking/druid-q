@@ -7,6 +7,7 @@ from events import SceneChangeEventValidator
 from subscriber import Subscriber
 from .strings import MESSAGES
 from .app import App
+from .scene_store import SceneStore  # ⬅️ new import
 
 load_dotenv()
 
@@ -35,9 +36,10 @@ def main():
     client.connect(DRUID_HOST, DRUID_PORT)
 
     redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
+    scene_store = SceneStore(redis_client)
 
     subscriber = Subscriber(client, DRUID_TOPIC, q, SceneChangeEventValidator())
-    app = App(queue=q, subscriber=subscriber, redis_client=redis_client)
+    app = App(queue=q, subscriber=subscriber, scene_store=scene_store)
     app.run()
 
 if __name__ == "__main__":
