@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Literal, Dict
 
 @dataclass
@@ -7,34 +7,21 @@ class Event:
 
 @dataclass
 class InfoEvent(Event):
+    type: Literal["info"] = field(default="info", init=False)
     payload: str
-
-    def __init__(self, message: str):
-        super().__init__(type="info")
-        self.payload = message
 
 @dataclass
 class GameEvent(Event):
+    type: Literal["game"] = field(default="game", init=False)
     payload: Dict[str, str]
-
-    def __init__(self, topic: str, message: str):
-        super().__init__(type="game")
-        self.payload = {"topic": topic, "message": message}
 
 @dataclass
 class SceneChangeEvent(Event):
+    type: Literal["scene"] = field(default="scene", init=False)
     scene: str
-    description: str 
-
-    def __init__(self, scene: str, description: str):
-        super().__init__(type="scene")
-        self.scene = scene
-        self.description = description
+    description: str
 
 @dataclass
 class CardReadEvent(Event):
+    type: Literal["card"] = field(default="card", init=False)
     uid: str
-
-    def __init__(self, uid: str):
-        super().__init__(type="card")
-        self.uid = uid
