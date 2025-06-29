@@ -9,6 +9,7 @@ from .strings import MESSAGES
 from .app import App
 from .scene_store import SceneStore
 from hue import get_lights_in_room, discover_bridge_ip
+import json
 
 load_dotenv()
 
@@ -42,14 +43,18 @@ def main():
     redis_client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     scene_store = SceneStore(redis_client)
 
-    hue_ip = scene_store.get_hue_ip()
+    room_lights = scene_store.get_room_lights()
 
-    if hue_ip is None:
-        hue_ip = discover_bridge_ip()
-        scene_store.set_hue_ip(hue_ip)
+    if room_lights is None:
+        hue_ip = scene_store.get_hue_ip()
 
-    room_data = get_lights_in_room(ROOM_NAME, HUE_API_KEY, hue_ip)
-    print(room_data)
+        if hue_ip is None:
+            hue_ip = discover_bridge_ip()
+            scene_store.set_hue_ip(hue_ip)
+
+        room_data = get_lights_in_room(ROOM_NAME, HUE_API_KEY, hue_ip)
+        scene_store.set_room_lights(json.dumps(room_data))
+ 
 
     subscriber = Subscriber(client, DRUID_TOPIC, q, SceneChangeEventValidator())
     app = App(queue=q, subscriber=subscriber, scene_store=scene_store)

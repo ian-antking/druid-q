@@ -1,5 +1,3 @@
-from python_hue_v2 import Hue
-import asyncio
 import requests
 
 def discover_bridge_ip():
@@ -11,16 +9,39 @@ def discover_bridge_ip():
     return bridges[0]["internalipaddress"]
 
 def get_lights_in_room(room_name: str, api_key: str, bridge_ip: str):
-    async def get_lights():
-        hue = Hue(bridge_ip, api_key)
+    headers = {
+        "hue-application-key": api_key
+    }
 
-        rooms = hue.rooms
+    url = f"https://{bridge_ip}/clip/v2/resource/room"
+    response = requests.get(url, headers=headers, verify=False)
+    response.raise_for_status()
 
-        print(type(rooms[0]))
-        print(dir(rooms[0]))
+    rooms = response.json().get("data", [])
 
-        lights = []
+    target_room = next((room for room in rooms if room["metadata"]["name"].lower() == room_name.lower()), None)
+    if not target_room:
+        raise ValueError(f"Room '{room_name}' not found")
 
-        return lights
+    lights = []
+    for light in target_room.get("children", []):
+        light_id = light["rid"]
+        light_url = f"https://{bridge_ip}/clip/v2/resource/device/{light_id}"
+        light_resp = requests.get(light_url, headers=headers, verify=False)
+        light_resp.raise_for_status()
+        lights.append(light_resp.json().get("data", [{}])[0])
 
-    return asyncio.run(get_lights())
+    return clean_hue_light_metadata(lights)
+
+def clean_hue_light_metadata(devices):
+    return {
+        "lights": [
+            {
+                "id": d["id"],
+                "name": d["metadata"]["name"],
+                "type": d["product_data"]["product_name"],
+                "archetype": d["metadata"].get("archetype", d["product_data"].get("product_archetype", "unknown")),
+            }
+            for d in devices
+        ]
+    }
