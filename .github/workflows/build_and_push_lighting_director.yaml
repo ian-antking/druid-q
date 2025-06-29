@@ -1,9 +1,9 @@
-name: Build and Push Hue Bridge
+name: Build and Push Lighting Director
 
 on:
   push:
     tags:
-      - 'hue-bridge-v*.*.*'
+      - 'lighting-director-v*.*.*'
   workflow_dispatch:
 
 jobs:
@@ -30,8 +30,8 @@ jobs:
             if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "VERSION=dev-manual" >> $GITHUB_ENV
             else
-            # Strip 'hue-bridge-' prefix
-            VERSION="${GITHUB_REF#refs/tags/hue-bridge-}"
+            # Strip 'lighting-director-' prefix
+            VERSION="${GITHUB_REF#refs/tags/lighting-director-}"
             echo "VERSION=$VERSION" >> $GITHUB_ENV
             fi
 
@@ -39,9 +39,9 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: sprites/hue_bridge/Dockerfile
+          file: sprites/lighting_director/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ghcr.io/${{ github.repository_owner }}/hue-bridge:${{ env.VERSION }}
-            ghcr.io/${{ github.repository_owner }}/hue-bridge:latest
+            ghcr.io/${{ github.repository_owner }}/lighting-director:${{ env.VERSION }}
+            ghcr.io/${{ github.repository_owner }}/lighting-director:latest

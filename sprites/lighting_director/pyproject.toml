@@ -1,5 +1,5 @@
 [project]
-name = "hue-bridge"
+name = "lighting-director"
 version = "0.1.10"
 description = ""
 authors = [
@@ -16,10 +16,10 @@ dependencies = [
 ]
 
 [tool.poetry]
-packages = [{include = "hue_bridge", from = "src"}]
+packages = [{include = "lighting_director", from = "src"}]
 
 [tool.poetry.scripts]
-hue_bridge = "hue_bridge.__main__:main"
+lighting_director = "lighting_director.__main__:main"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

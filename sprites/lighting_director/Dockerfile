@@ -2,15 +2,15 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY sprites/hue_bridge/src/hue_bridge ./hue_bridge
+COPY sprites/lighting_director/src/lighting_director ./lighting_director
 
 COPY common/subscriber ./subscriber
 COPY common/events ./events
 
-COPY sprites/hue_bridge/requirements.txt ./
+COPY sprites/lighting_director/requirements.txt ./
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 ENV PYTHONPATH=/app
 
-CMD ["python", "-m", "hue_bridge"]
+CMD ["python", "-m", "lighting_director"]
