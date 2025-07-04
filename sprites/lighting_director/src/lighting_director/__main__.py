@@ -8,7 +8,7 @@ from subscriber import Subscriber
 from .strings import MESSAGES
 from .app import App
 from .scene_store import SceneStore
-from hue import get_lights_in_room, discover_bridge_ip
+from .hue import get_lights_in_room, discover_bridge_ip
 import json
 
 load_dotenv()
