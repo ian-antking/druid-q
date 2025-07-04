@@ -19,7 +19,8 @@ class LLMClient:
         messages = [
             {"role": "system", "content": "You are an expert lighting designer for immersive tabletop gaming sessions."},
             {"role": "system", "content": f"You have access to these lights: {self.lights}"},
-            {"role": "system", "content": f"Please provide your responses in a valid JSON array, using this schema: {self.schema}"}
+            {"role": "system", "content": f"Please provide your responses in a valid JSON array, using this schema: {self.schema}"},
+            {"role": "system", "content": f"Please respond in JSON only, with no other text"}
         ]
 
         if self.lighting_context:
