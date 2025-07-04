@@ -1,7 +1,12 @@
 async-timeout==5.0.1 ; python_version >= "3.10" and python_full_version < "3.11.3"
-paho-mqtt==2.1.0 ; python_version >= "3.10"
-python-dotenv==1.1.0 ; python_version >= "3.10"
-redis==6.2.0 ; python_version >= "3.10"
+certifi==2025.6.15 ; python_version >= "3.10" and python_version < "4.0"
+charset-normalizer==3.4.2 ; python_version >= "3.10" and python_version < "4.0"
+idna==3.10 ; python_version >= "3.10" and python_version < "4.0"
+paho-mqtt==2.1.0 ; python_version >= "3.10" and python_version < "4.0"
+python-dotenv==1.1.0 ; python_version >= "3.10" and python_version < "4.0"
+redis==6.2.0 ; python_version >= "3.10" and python_version < "4.0"
+requests==2.32.4 ; python_version >= "3.10" and python_version < "4.0"
+urllib3==2.5.0 ; python_version >= "3.10" and python_version < "4.0"
 
 -e ./subscriber
 -e ./events
