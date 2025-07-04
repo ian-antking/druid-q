@@ -1,0 +1,38 @@
+[{
+  "id": "dlfjk3r38rfkm3", // the id of the light
+  "on": {
+    "on": true // boolean, true to turn on, false to turn off
+  },
+  "dimming": {
+    "brightness": 75 // number (1-100), sets brightness
+  },
+  "color_temperature": {
+    "mirek": 250 // integer (153-500), lower = cooler, higher = warmer
+  },
+  "color": {
+    "xy": {
+      "x": 0.5, // float (0-1), X in CIE color space
+      "y": 0.5  // float (0-1), Y in CIE color space
+    }
+  },
+  "effects_v2": {
+    "action": {
+      "effect": "sparkle", // one of: prism, opal, glisten, sparkle, fire, candle, underwater, cosmos, sunbeam, enchant, no_effect
+      "parameters": {
+        "color": {
+          "xy": {
+            "x": 0.4,
+            "y": 0.4
+          }
+        },
+        "speed": 0.8 // number (0-1), optional
+      }
+    }
+  },
+  "alert": {
+    "action": "breathe" // triggers a brief visual flash
+  },
+  "dynamics": {
+    "duration": 1000 // ms transition time
+  }
+}]
