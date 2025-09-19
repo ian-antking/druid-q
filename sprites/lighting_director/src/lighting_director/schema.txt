@@ -1,38 +1,132 @@
-[{
-  "id": "dlfjk3r38rfkm3", // the id of the light
-  "on": {
-    "on": true // boolean, true to turn on, false to turn off
-  },
-  "dimming": {
-    "brightness": 75 // number (1-100), sets brightness
-  },
-  "color_temperature": {
-    "mirek": 250 // integer (153-500), lower = cooler, higher = warmer
-  },
-  "color": {
-    "xy": {
-      "x": 0.5, // float (0-1), X in CIE color space
-      "y": 0.5  // float (0-1), Y in CIE color space
-    }
-  },
-  "effects_v2": {
-    "action": {
-      "effect": "sparkle", // one of: prism, opal, glisten, sparkle, fire, candle, underwater, cosmos, sunbeam, enchant, no_effect
-      "parameters": {
-        "color": {
-          "xy": {
-            "x": 0.4,
-            "y": 0.4
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The unique identifier of the light."
+      },
+      "on": {
+        "type": "object",
+        "properties": {
+          "on": {
+            "type": "boolean",
+            "description": "true to turn the light on, false to turn it off."
           }
         },
-        "speed": 0.8 // number (0-1), optional
+        "required": ["on"]
+      },
+      "dimming": {
+        "type": "object",
+        "properties": {
+          "brightness": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 100,
+            "description": "Sets the brightness of the light from 0 to 100."
+          }
+        },
+        "required": ["brightness"]
+      },
+      "color_temperature": {
+        "type": "object",
+        "properties": {
+          "mirek": {
+            "type": "integer",
+            "minimum": 153,
+            "maximum": 500,
+            "description": "Color temperature in Mirek scale (153=cool, 500=warm)."
+          }
+        },
+        "required": ["mirek"]
+      },
+      "color": {
+        "type": "object",
+        "properties": {
+          "xy": {
+            "type": "object",
+            "properties": {
+              "x": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              },
+              "y": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1
+              }
+            },
+            "required": ["x", "y"]
+          }
+        },
+        "required": ["xy"]
+      },
+      "effects_v2": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "object",
+            "properties": {
+              "effect": {
+                "type": "string",
+                "enum": ["prism", "opal", "glisten", "sparkle", "fire", "candle", "underwater", "cosmos", "sunbeam", "enchant", "no_effect"],
+                "description": "The visual effect to apply to the light."
+              },
+              "parameters": {
+                "type": "object",
+                "properties": {
+                  "color": {
+                    "type": "object",
+                    "properties": {
+                      "xy": {
+                        "type": "object",
+                        "properties": {
+                          "x": { "type": "number", "minimum": 0, "maximum": 1 },
+                          "y": { "type": "number", "minimum": 0, "maximum": 1 }
+                        },
+                        "required": ["x", "y"]
+                      }
+                    },
+                    "required": ["xy"]
+                  },
+                  "speed": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1,
+                    "description": "The speed of the effect, from 0 to 1."
+                  }
+                }
+              }
+            },
+            "required": ["effect"]
+          }
+        },
+        "required": ["action"]
+      },
+      "alert": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["breathe"],
+            "description": "Triggers a brief visual alert."
+          }
+        },
+        "required": ["action"]
+      },
+      "dynamics": {
+        "type": "object",
+        "properties": {
+          "duration": {
+            "type": "integer",
+            "description": "The transition time for the change in milliseconds."
+          }
+        },
+        "required": ["duration"]
       }
-    }
-  },
-  "alert": {
-    "action": "breathe" // triggers a brief visual flash
-  },
-  "dynamics": {
-    "duration": 1000 // ms transition time
+    },
+    "required": ["id"]
   }
-}]
+}
