@@ -62,7 +62,7 @@ def main():
         room_lights = get_lights_in_room(ROOM_NAME, HUE_API_KEY, hue_ip)
         scene_store.set_room_lights(json.dumps(room_lights))
 
-    llm_client = LLMClient(api_key=LLM_API_KEY, model="gpt-4", lights=room_lights, lighting_context=lighting_context)
+    llm_client = LLMClient(api_key=LLM_API_KEY, model="gpt-4o-2024-08-06", lights=room_lights, lighting_context=lighting_context)
  
     subscriber = Subscriber(client, DRUID_TOPIC, q, SceneChangeEventValidator())
     app = App(queue=q, subscriber=subscriber, scene_store=scene_store, llm_client=llm_client)
