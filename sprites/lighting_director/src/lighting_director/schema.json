@@ -10,7 +10,9 @@
           "id": { "type": "string", "description": "The unique identifier of the light." },
           "on": {
             "type": "object",
-            "properties": { "on": { "type": "boolean", "description": "true to turn the light on, false to turn it off." } },
+            "properties": {
+              "on": { "type": "boolean", "description": "true to turn the light on, false to turn it off." }
+            },
             "required": ["on"],
             "additionalProperties": false
           },
@@ -92,7 +94,7 @@
             "additionalProperties": false
           }
         },
-        "required": ["id"],
+        "required": ["id","on","dimming","color_temperature","color","effects_v2","alert","dynamics"],
         "additionalProperties": false
       }
     }
