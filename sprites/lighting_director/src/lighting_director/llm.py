@@ -12,7 +12,7 @@ class LLMClient:
         self.lighting_context = lighting_context
         self.model = model
 
-        schema_path = Path(__file__).parent / "schema.txt"
+        schema_path = Path(__file__).parent / "schema.json"
         with open(schema_path, "r", encoding="utf-8") as f:
             self.schema = json.load(f)
 
