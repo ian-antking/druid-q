@@ -1,4 +1,5 @@
 {
+  "$schema": "http://json-schema.org/draft-07/schema#",
   "type": "object",
   "properties": {
     "lights": {
@@ -18,7 +19,8 @@
                 "description": "true to turn the light on, false to turn it off."
               }
             },
-            "required": ["on"]
+            "required": ["on"],
+            "additionalProperties": false
           },
           "dimming": {
             "type": "object",
@@ -30,7 +32,8 @@
                 "description": "Sets the brightness of the light from 0 to 100."
               }
             },
-            "required": ["brightness"]
+            "required": ["brightness"],
+            "additionalProperties": false
           },
           "color_temperature": {
             "type": "object",
@@ -42,7 +45,8 @@
                 "description": "Color temperature in Mirek scale (153=cool, 500=warm)."
               }
             },
-            "required": ["mirek"]
+            "required": ["mirek"],
+            "additionalProperties": false
           },
           "color": {
             "type": "object",
@@ -50,13 +54,23 @@
               "xy": {
                 "type": "object",
                 "properties": {
-                  "x": { "type": "number", "minimum": 0, "maximum": 1 },
-                  "y": { "type": "number", "minimum": 0, "maximum": 1 }
+                  "x": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "y": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  }
                 },
-                "required": ["x", "y"]
+                "required": ["x", "y"],
+                "additionalProperties": false
               }
             },
-            "required": ["xy"]
+            "required": ["xy"],
+            "additionalProperties": false
           },
           "effects_v2": {
             "type": "object",
@@ -84,10 +98,12 @@
                               "x": { "type": "number", "minimum": 0, "maximum": 1 },
                               "y": { "type": "number", "minimum": 0, "maximum": 1 }
                             },
-                            "required": ["x", "y"]
+                            "required": ["x", "y"],
+                            "additionalProperties": false
                           }
                         },
-                        "required": ["xy"]
+                        "required": ["xy"],
+                        "additionalProperties": false
                       },
                       "speed": {
                         "type": "number",
@@ -95,13 +111,16 @@
                         "maximum": 1,
                         "description": "The speed of the effect, from 0 to 1."
                       }
-                    }
+                    },
+                    "additionalProperties": false
                   }
                 },
-                "required": ["effect"]
+                "required": ["effect"],
+                "additionalProperties": false
               }
             },
-            "required": ["action"]
+            "required": ["action"],
+            "additionalProperties": false
           },
           "alert": {
             "type": "object",
@@ -112,7 +131,8 @@
                 "description": "Triggers a brief visual alert."
               }
             },
-            "required": ["action"]
+            "required": ["action"],
+            "additionalProperties": false
           },
           "dynamics": {
             "type": "object",
@@ -122,10 +142,12 @@
                 "description": "The transition time for the change in milliseconds."
               }
             },
-            "required": ["duration"]
+            "required": ["duration"],
+            "additionalProperties": false
           }
         },
-        "required": ["id"]
+        "required": ["id"],
+        "additionalProperties": false
       }
     }
   },
