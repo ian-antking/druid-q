@@ -129,5 +129,6 @@
       }
     }
   },
-  "required": ["lights"]
+  "required": ["lights"],
+  "additionalProperties": false
 }
