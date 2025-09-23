@@ -1,7 +1,10 @@
+from lighting_controller.scene_queue import SceneQueue
+
 class App:
-    def __init__(self):
-        print("__init__")
-        
+    def __init__(self, queue: SceneQueue):
+        self.queue = queue
 
     def run(self):
-        print("hello world")
+        while True:
+            message = self.queue.read_scene()
+            print(message)
