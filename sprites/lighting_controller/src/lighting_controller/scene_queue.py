@@ -7,9 +7,14 @@ class SceneQueue:
 
     def read_scene(self):
         try:
-            return self.redis.rpop(self.queue)
+            result = self.redis.brpop(self.queue, timeout=5)
+            if result is None:
+                return None 
+            _, value = result
+            return value
         except Exception as e:
             print(f"Redis error: {e}", flush=True)
+            return None
 
     def get_hue_ip(self):
         try:
