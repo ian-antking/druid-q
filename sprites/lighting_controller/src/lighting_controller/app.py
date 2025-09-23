@@ -9,4 +9,5 @@ class App:
     def run(self):
         while True:
             message = self.queue.read_scene()
-            self.hue.set_lights(message)
+            if message:
+                self.hue.set_lights(message)
