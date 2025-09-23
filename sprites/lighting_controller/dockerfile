@@ -1,0 +1,16 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+COPY sprites/lighting_controller/src/lighting_controller ./lighting_controller
+
+COPY common/subscriber ./subscriber
+COPY common/events ./events
+
+COPY sprites/lighting_controller/requirements.txt ./
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV PYTHONPATH=/app
+
+CMD ["python", "-m", "lighting_controller"]
