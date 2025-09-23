@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from .app import App
 
 load_dotenv()
 
@@ -11,6 +12,10 @@ def main() :
     print(HUE_API_KEY)
     print(ROOM_NAME)
     print(REDIS_HOST)
+
+    app = App()
+
+    app.run()
 
 if __name__ == "__main__":
     main()
