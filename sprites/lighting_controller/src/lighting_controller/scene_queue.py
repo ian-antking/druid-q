@@ -1,10 +1,13 @@
+from redis import Redis
+
 class SceneQueue:
-    def __init__(self, redis_client):
+    def __init__(self, redis_client: Redis, queue_name: str):
         self.redis = redis_client
+        self.queue = queue_name
 
     def read_scene(self):
         try:
-            return self.redis.rpop()
+            return self.redis.rpop(self.queue)
         except Exception as e:
             print(f"Redis error: {e}", flush=True)
 

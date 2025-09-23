@@ -11,6 +11,7 @@ load_dotenv()
 HUE_API_KEY = os.getenv("HUE_API_KEY")
 ROOM_NAME = os.getenv("ROOM_NAME")
 REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
+REDIS_QUEUE = os.getenv("REDIS_QUEUE", "lighting_controller")
 REDIS_PORT = 6379
 
 if not all([HUE_API_KEY, ROOM_NAME]):
@@ -22,7 +23,7 @@ def main() :
     print(REDIS_HOST)
 
     redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
-    cache = SceneQueue(redis_client)
+    cache = SceneQueue(redis_client, REDIS_QUEUE)
 
     bridge_ip = cache.get_hue_ip()
 
