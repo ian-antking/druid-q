@@ -1,6 +1,6 @@
 [project]
 name = "lighting-controller"
-version = "0.1.10"
+version = "0.1.4"
 description = ""
 authors = [
     {name = "Ian King",email = "ian.antking@gmail.com"}
