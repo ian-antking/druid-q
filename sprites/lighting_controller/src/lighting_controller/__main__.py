@@ -2,9 +2,9 @@ import os
 from dotenv import load_dotenv
 from .app import App
 from redis import Redis
-from scene_queue import SceneQueue
-from strings import MESSAGES
-from hue import Hue, discover_bridge_ip
+from .scene_queue import SceneQueue
+from .strings import MESSAGES
+from .hue import Hue, discover_bridge_ip
 
 load_dotenv()
 
@@ -24,13 +24,15 @@ def main() :
     redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     cache = SceneQueue(redis_client)
 
-    hue_ip = cache.get_hue_ip()
+    bridge_ip = cache.get_hue_ip()
 
-    if hue_ip is None:
-        hue_ip = discover_bridge_ip()
-        cache.set_hue_ip(hue_ip)
+    if bridge_ip is None:
+        bridge_ip = discover_bridge_ip()
+        cache.set_hue_ip(bridge_ip)
 
-    app = App(cache)
+    hue = Hue(bridge_ip)
+
+    app = App(cache, hue)
 
     app.run()
 
