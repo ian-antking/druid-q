@@ -10,6 +10,7 @@ class SceneQueue:
             result = self.redis.brpop(self.queue, timeout=5)
             if result is None:
                 return None 
+            print("message received: {}".format(result), flush=True)
             _, value = result
             return value
         except Exception as e:

@@ -13,4 +13,4 @@ class Hue:
         self.bridge_ip = bridge_ip
 
     def set_lights(self, light_setting):
-        print(light_setting)
+        print(light_setting, flush=True)
