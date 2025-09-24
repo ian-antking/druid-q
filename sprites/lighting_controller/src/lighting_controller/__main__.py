@@ -18,10 +18,6 @@ if not all([HUE_API_KEY, ROOM_NAME]):
     raise EnvironmentError(MESSAGES["missing_env_error"])
 
 def main() :
-    print(HUE_API_KEY)
-    print(ROOM_NAME)
-    print(REDIS_HOST)
-
     redis_client = Redis(host=REDIS_HOST, port=REDIS_PORT, decode_responses=True)
     cache = SceneQueue(redis_client, REDIS_QUEUE)
 
