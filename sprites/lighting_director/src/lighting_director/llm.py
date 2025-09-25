@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import openai
+from importlib import resources
 
 class LLMClient:
     def __init__(self, api_key: str = None, model: str = "gpt-4o-2024-08-06", lights: str = "", lighting_context: str = ""):
@@ -12,8 +13,7 @@ class LLMClient:
         self.lighting_context = lighting_context
         self.model = model
 
-        schema_path = Path(__file__).parent / "schema.json"
-        with open(schema_path, "r", encoding="utf-8") as f:
+        with resources.files("events").joinpath("scene_schema.json").open("r", encoding="utf-8") as f:
             self.schema = json.load(f)
 
     def generate_scene_design(self, scene_name, scene_description):

@@ -19,6 +19,7 @@ dependencies = [
 
 [tool.poetry]
 packages = [{include = "lighting_director", from = "src"}]
+include = ["src/events/scene_schema.json"]
 
 [tool.poetry.scripts]
 lighting_director = "lighting_director.__main__:main"
